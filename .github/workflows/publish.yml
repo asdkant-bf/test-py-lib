@@ -52,12 +52,20 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.build.outputs.version }}
-          name: Release v${{ steps.build.outputs.version }}
-          files: |
+        uses: ncipollo/release-action@v1
+        with: 
+          artifacts: |
             dist/*.whl
             dist/*.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: v${{ steps.build.outputs.version }}
+      
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: v${{ steps.build.outputs.version }}
+      #     name: Release v${{ steps.build.outputs.version }}
+      #     files: |
+      #       dist/*.whl
+      #       dist/*.tar.gz
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
