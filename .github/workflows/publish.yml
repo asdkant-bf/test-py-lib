@@ -26,19 +26,22 @@ jobs:
       - name: Set correct version
         id: set_version
         run: |
+          YELLOW='\033[1;33m'
+          NC='\033[0m' # No Color
           VERSION=$(uv version --short)
           INITIAL_VERSION=$VERSION
           echo "initial_version=$INITIAL_VERSION" >> $GITHUB_OUTPUT
-          echo "Initial Version: $INITIAL_VERSION"
+          echo "${YELLOW}Initial Version: ${INITIAL_VERSION}${NC}"
           
           while gh release view v$VERSION > /dev/null 2>&1; do
             uv version --bump patch
             VERSION=$(uv version --short)
-            echo "Bumped to $VERSION"
+            echo "${YELLOW}Bumped to ${VERSION}${NC}"
           done
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           # set GH variable for new version if it's different than initial version
           if [ "$VERSION" != "$INITIAL_VERSION" ]; then
+            echo "${YELLOW} Pushing updated pyproject.tom${NC}"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add pyproject.toml
@@ -60,14 +63,3 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
           tag: v${{ steps.set_version.outputs.version }}
-      
-      # - name: Create Release
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     tag_name: v${{ steps.set_version.outputs.version }}
-      #     name: Release v${{ steps.set_version.outputs.version }}
-      #     files: |
-      #       dist/*.whl
-      #       dist/*.tar.gz
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
