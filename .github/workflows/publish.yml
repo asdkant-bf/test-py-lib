@@ -2,11 +2,12 @@ name: Publish Release
 
 on:
   workflow_dispatch:
-permissions:
-  contents: write
+
 
 jobs:
   publish:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,14 +26,17 @@ jobs:
       - name: Set correct version
         id: set_version
         run: |
-          VERSION=$(uv version)
+          VERSION=$(uv version --short)
           INITIAL_VERSION=$VERSION
           echo "initial_version=$INITIAL_VERSION" >> $GITHUB_OUTPUT
+          echo "Initial Version: $INITIAL_VERSION"
           
           while gh release view v$VERSION > /dev/null 2>&1; do
             uv version --bump patch
-            VERSION=$(uv version)
+            VERSION=$(uv version --short)
+            echo "Bumped to $VERSION"
           done
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           # set GH variable for new version if it's different than initial version
           if [ "$VERSION" != "$INITIAL_VERSION" ]; then
             git config user.name "github-actions[bot]"
@@ -48,8 +52,6 @@ jobs:
         id: build
         run: |
           uv build
-          VERSION=$(uv version)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: ncipollo/release-action@v1
@@ -57,13 +59,13 @@ jobs:
           artifacts: |
             dist/*.whl
             dist/*.tar.gz
-          tag: v${{ steps.build.outputs.version }}
+          tag: v${{ steps.set_version.outputs.version }}
       
       # - name: Create Release
       #   uses: softprops/action-gh-release@v2
       #   with:
-      #     tag_name: v${{ steps.build.outputs.version }}
-      #     name: Release v${{ steps.build.outputs.version }}
+      #     tag_name: v${{ steps.set_version.outputs.version }}
+      #     name: Release v${{ steps.set_version.outputs.version }}
       #     files: |
       #       dist/*.whl
       #       dist/*.tar.gz
