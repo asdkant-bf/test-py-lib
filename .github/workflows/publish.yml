@@ -45,8 +45,8 @@ jobs:
             git commit -m "Bump patch version for release: v$INITIAL_VERSION -> v$VERSION"
             git push
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #env:
+        #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         id: build
