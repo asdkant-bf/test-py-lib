@@ -31,17 +31,17 @@ jobs:
           VERSION=$(uv version --short)
           INITIAL_VERSION=$VERSION
           echo "initial_version=$INITIAL_VERSION" >> $GITHUB_OUTPUT
-          echo "${YELLOW}Initial Version: ${INITIAL_VERSION}${NC}"
+          echo "::notice ::Initial Version: ${INITIAL_VERSION}"
           
           while gh release view v$VERSION > /dev/null 2>&1; do
             uv version --bump patch
             VERSION=$(uv version --short)
-            echo "${YELLOW}Bumped to ${VERSION}${NC}"
+            echo "::notice ::Bumped to ${VERSION}"
           done
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           # set GH variable for new version if it's different than initial version
           if [ "$VERSION" != "$INITIAL_VERSION" ]; then
-            echo "${YELLOW} Pushing updated pyproject.tom${NC}"
+            echo "::notice ::Pushing updated pyproject.tom"
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add pyproject.toml
